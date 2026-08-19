@@ -3,6 +3,60 @@
  */
 
 /**
+ * Safe handler for /checkin
+ */
+function handleCheckIn(event) {
+  var userEmail = getAuthenticatedUserEmail(event);
+  
+  // 1. READ SHEET FIRST
+  var empCtx = getEmployeeContext(userEmail);
+
+  // 2. CHECK REGISTRATION & ACCESS
+  if (!empCtx.isRegistered) {
+    return renderSimpleTextCard(
+      "Access Denied", 
+      "Your email (" + userEmail + ") was not found in the EMS spreadsheet. Please contact HR."
+    );
+  }
+  if (!empCtx.isActive) {
+    return renderSimpleTextCard(
+      "Account Inactive", 
+      "Your EMS account is currently marked as inactive."
+    );
+  }
+
+  // 3. ONLY THEN RENDER THE FORM
+  return renderAttendanceFormCard(empCtx.record);
+}
+
+/**
+ * Safe handler for /leave
+ */
+function handleLeaveRequest(event) {
+  var userEmail = getAuthenticatedUserEmail(event);
+
+  // 1. READ SHEET FIRST
+  var empCtx = getEmployeeContext(userEmail);
+
+  // 2. CHECK REGISTRATION & ACCESS
+  if (!empCtx.isRegistered) {
+    return renderSimpleTextCard(
+      "Access Denied", 
+      "Your email (" + userEmail + ") was not found in the EMS spreadsheet. Please contact HR."
+    );
+  }
+  if (!empCtx.isActive) {
+    return renderSimpleTextCard(
+      "Account Inactive", 
+      "Your EMS account is currently marked as inactive."
+    );
+  }
+
+  // 3. ONLY THEN RENDER THE FORM
+  return renderLeaveFormCard(empCtx.record);
+}
+
+/**
  * Triggers automatically whenever a user sends a message to the bot.
  * 
  * @param {Object} event - The Google Chat event object.

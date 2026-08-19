@@ -46,7 +46,7 @@ function getConfigValue(key) {
 }
 
 function getEmsSpreadsheet() {
-  var propId = PropertiesService.getScriptProperties().getProperty('SPREADSHEET_ID');
+  var propId = PropertiesService.getScriptProperties().getProperty(CONFIG_KEYS.SPREADSHEET_ID);
   if (propId) {
     return SpreadsheetApp.openById(propId);
   }
