@@ -2,6 +2,9 @@
 .clasprc.json
 creds.json
 
+# Local clasp settings (contains private Script & GCP IDs)
+.clasp.json
+
 # Dependencies & Node
 node_modules/
 
