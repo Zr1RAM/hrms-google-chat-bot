@@ -1,0 +1,10 @@
+# Clasp / Credentials
+.clasprc.json
+creds.json
+
+# Dependencies & Node
+node_modules/
+
+# OS specific files
+.DS_Store
+Thumbs.db
