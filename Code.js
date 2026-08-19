@@ -2,8 +2,36 @@
  * Google Chat Webhook Handler & Card User Interface Presentation Layer
  */
 
+/**
+ * Triggers automatically whenever a user sends a message to the bot.
+ * 
+ * @param {Object} event - The Google Chat event object.
+ * @return {Object} - The message or card payload returned to the user.
+ */
 function onMessage(event) {
-  return handleChatInteraction(event);
+  // Extract user text safely and normalize it
+  var userMessage = event.message && event.message.text ? event.message.text.trim().toLowerCase() : "";
+  var userName = event.user ? event.user.displayName : "there";
+
+  // Handle specific user input commands
+  if (userMessage === "hi" || userMessage === "hello") {
+    return {
+      "text": "Hello " + userName + "! How can I assist you with EMS today?\nType \n`/checkin` \nor \n`/leave` \nto get started."
+    };
+  }
+
+  if (userMessage === "/checkin") {
+    return handleCheckIn(event);
+  }
+
+  if (userMessage === "/leave") {
+    return handleLeaveRequest(event);
+  }
+
+  // Fallback response for unhandled text
+  return {
+    "text": "I received: \"" + event.message.text + "\", but I'm not sure what to do with that. Type `hi` for available commands."
+  };
 }
 
 function onCardClick(event) {
