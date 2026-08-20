@@ -16,7 +16,7 @@ function processLeaveApplication(actorEmail, leaveCode, requestedDays, startDate
     if (!checkPermission(empCtx, 'ReadWrite')) throw new Error('Role permissions restrict submitting leave.');
 
     var leaveCodeClean = String(leaveCode).toUpperCase().trim(); // CL, SL, PL
-    var validCodes = ['CL', 'SL', 'PL'];
+    var validCodes = ['CL', 'SL', 'EL', 'LL'];
     if (validCodes.indexOf(leaveCodeClean) === -1) throw new Error('Invalid Leave Type specified.');
 
     var currentBalance = parseFloat(empCtx.record[leaveCodeClean]);
@@ -43,7 +43,7 @@ function processLeaveApplication(actorEmail, leaveCode, requestedDays, startDate
     var requestId = 'LV-' + Utilities.getUuid().substring(0, 8).toUpperCase();
     var nowStr = Utilities.formatDate(new Date(), getConfigValue('TIMEZONE'), 'yyyy-MM-dd HH:mm:ss');
     
-    var leaveDisplayNames = { 'CL': 'Casual Leave', 'SL': 'Sick Leave', 'PL': 'Privilege Leave' };
+    var leaveDisplayNames = { 'CL': 'Casual Leave', 'SL': 'Sick Leave', 'EL': 'Earned Leave', 'LL': "Loyalty Leave" };
 
     var histRow = [];
     for (var c = 1; c <= historySheet.getLastColumn(); c++) histRow.push('');

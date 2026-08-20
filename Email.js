@@ -39,7 +39,7 @@ function sendLeaveNotificationEmail(empRecord, leavePayload) {
   try {
     var recipient = empRecord['Leave Email Recipient'] || getConfigValue('HR_LEAVE_EMAIL');
     
-    var typeDisplayMap = { 'CL': 'casual', 'SL': 'sick', 'PL': 'privilege' };
+    var typeDisplayMap = { 'CL': 'casual', 'SL': 'sick', 'EL': 'Earned', 'LL': 'Loyalty' };
     var typeName = typeDisplayMap[leavePayload.leaveCode] || leavePayload.leaveCode;
     
     var subject = 'Leave application ::: ' + typeName + ' ::: ' + leavePayload.requestedDays + ' days';
