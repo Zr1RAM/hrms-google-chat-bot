@@ -70,17 +70,22 @@ function onMessage(event) {
   // Handle specific user input commands
   if (userMessage === "hi" || userMessage === "hello") {
     return {
-      "text": "Hello " + userName + "! How can I assist you with EMS today?\nType \n`/checkin` \nor \n`/leave` \nto get started."
+      "text": "Hi! " + userName + "👋 I’m your HR Assistant - Chennai.\nPlease select an option to continue: \n1. Leave Balance \n2. Timesheet Due Date"
     };
   }
 
-  if (userMessage === "/checkin") {
+  if (userMessage === "2") {
     return handleCheckIn(event);
   }
 
-  if (userMessage === "/leave") {
+  if (userMessage === "1") {
     return handleLeaveRequest(event);
   }
+
+  // // NEW: Testing Feature
+  // if (userMessage === "3") {
+  //   return renderTestMainMenuCard(getAuthenticatedUserEmail(event));
+  // }
 
   // Fallback response for unhandled text
   return {
@@ -114,6 +119,29 @@ function handleChatInteraction(event) {
     switch (action) {
       case 'HOME':
         return renderHomeScreen(userEmail, "Main Menu");
+
+      // --- TEST MENU ADDON ACTIONS ---
+      case 'SHOW_TEST_MAIN_MENU':
+        return renderTestMainMenuCard(userEmail);
+
+      case 'SHOW_TEST_SUBMENU_1':
+        return renderTestSubmenu1Card();
+
+      case 'SHOW_TEST_SUBMENU_2':
+        return renderTestSubmenu2Card();
+
+      case 'TEST_ACTION_SOFTWARE':
+        return renderSimpleTextCard("IT Support", "Your Software Request ticket has been submitted.");
+
+      case 'TEST_ACTION_PASSWORD':
+        return renderSimpleTextCard("IT Support", "Password reset instructions sent to " + userEmail);
+
+      case 'TEST_ACTION_POLICY':
+        return renderSimpleTextCard("HR Services", "You can find company policies on the internal wiki.");
+
+      case 'TEST_ACTION_CONTACT':
+        return renderSimpleTextCard("HR Services", "Your HR Representative is online and notified.");
+      // -------------------------------
 
       case 'VIEW_PROFILE':
         return renderProfileCard(empCtx.record);
@@ -209,7 +237,7 @@ function renderProfileCard(empRecord) {
             { decoratedText: { topLabel: "EMP ID", text: empRecord['EMP ID'] } },
             { decoratedText: { topLabel: "Role", text: empRecord['Role'] } },
             { decoratedText: { topLabel: "Project", text: empRecord['Project'] || 'Unassigned' } },
-            { decoratedText: { topLabel: "Leave Balances", text: "CL: " + empRecord['CL'] + " | SL: " + empRecord['SL'] + " | PL: " + empRecord['PL'] } }
+            { decoratedText: { topLabel: "Leave Balances", text: "CL: " + empRecord['CL'] + " | SL: " + empRecord['SL'] + " | PL: " + empRecord['EL'] + " | LL: " + empRecord['LL'] } }
           ]
         }]
       }
@@ -217,6 +245,9 @@ function renderProfileCard(empRecord) {
   };
 }
 
+/**
+ * Renders the Timesheet Due Date Card with dynamic status checking
+ */
 function renderAttendanceFormCard(empRecord) {
   var win = getAttendanceEditingWindow();
   var dateHelp = "Editable: Current month (" + win.currentMonthStart + " to Today)";
@@ -226,21 +257,60 @@ function renderAttendanceFormCard(empRecord) {
     dateHelp += "\nPrev Month (" + win.prevMonthName + ") is LOCKED";
   }
 
+  // Helper function for date evaluation
+function getDueDateStatus(rawDueDate) {
+  if (!rawDueDate) return "Cannot find timesheet due date";
+
+  // Force both dates into standard "YYYY-MM-DD" text format
+  var tz = Session.getScriptTimeZone();
+  var today = Utilities.formatDate(new Date(), tz, "yyyy-MM-dd");
+  
+  // If it's a Sheet Date object, format it. If text "DD-MM-YYYY", flip it to "YYYY-MM-DD".
+  var dueDate = (rawDueDate instanceof Date)
+    ? Utilities.formatDate(rawDueDate, tz, "yyyy-MM-dd")
+    : String(rawDueDate).trim().split("-").reverse().join("-");
+
+  // Format clean display text
+  var displayText = (rawDueDate instanceof Date)
+    ? Utilities.formatDate(rawDueDate, tz, "dd-MM-yyyy")
+    : String(rawDueDate);
+
+  if (today === dueDate) {
+    displayText += "\n⏰ <b>Due today! Please submit immediately to avoid delay.</b>";
+  } else if (today > dueDate) {
+    displayText += "\n⚠️ <b>Due date has passed, avoid the delay</b>";
+  }
+
+  return displayText;
+}
+var dueDateStatus = getDueDateStatus(empRecord['Timesheet Due Date']);
+console.log(dueDateStatus);
+
+
   return {
     actionResponse: { type: "NEW_MESSAGE" },
     cardsV2: [{
       cardId: "attCard",
       card: {
-        header: { title: "Attendance Submission", subtitle: dateHelp },
+        // header: { title: "Attendance Submission", subtitle: dateHelp },
+        header: { title: "Your Timesheet Due date" },
         sections: [{
           widgets: [
-            { textInput: { name: "att_date", label: "Date (YYYY-MM-DD)", value: win.today } },
-            { textInput: { name: "in_time", label: "In Time", value: empRecord['In Time'] || "09:00 AM" } },
-            { textInput: { name: "out_time", label: "Out Time", value: empRecord['Out Time'] || "06:30 PM" } },
-            { textInput: { name: "activities", label: "Activities Completed", type: "MULTILINE" } },
-            { textInput: { name: "incomplete_tasks", label: "Incomplete Tasks", value: "N/A" } },
-            { textInput: { name: "blockages", label: "Blockages / Challenges", value: "N/A" } },
-            { buttonList: { buttons: [{ text: "Submit Report", onClick: { action: { actionMethodName: "SUBMIT_ATTENDANCE" } } }] } }
+            {
+              decoratedText: { topLabel: "Due Date Status" }
+            },
+            {
+              textParagraph: {
+                text: "<b>Due Date:</b> " + dueDateStatus
+              }
+            }
+            // { textInput: { name: "att_date", label: "Date (YYYY-MM-DD)", value: win.today } },
+            // { textInput: { name: "in_time", label: "In Time", value: empRecord['In Time'] || "09:00 AM" } },
+            // { textInput: { name: "out_time", label: "Out Time", value: empRecord['Out Time'] || "06:30 PM" } },
+            // { textInput: { name: "activities", label: "Activities Completed", type: "MULTILINE" } },
+            // { textInput: { name: "incomplete_tasks", label: "Incomplete Tasks", value: "N/A" } },
+            // { textInput: { name: "blockages", label: "Blockages / Challenges", value: "N/A" } },
+            // { buttonList: { buttons: [{ text: "Submit Report", onClick: { action: { actionMethodName: "SUBMIT_ATTENDANCE" } } }] } }
           ]
         }]
       }
@@ -248,24 +318,3 @@ function renderAttendanceFormCard(empRecord) {
   };
 }
 
-function renderLeaveFormCard(empRecord) {
-  return {
-    actionResponse: { type: "NEW_MESSAGE" },
-    cardsV2: [{
-      cardId: "leaveCard",
-      card: {
-        header: { title: "Apply for Leave", subtitle: "Available Balances -> CL: " + empRecord['CL'] + " | SL: " + empRecord['SL'] + " | PL: " + empRecord['PL'] },
-        sections: [{
-          widgets: [
-            { textInput: { name: "leave_type", label: "Leave Type (CL / SL / PL)", value: "CL" } },
-            { textInput: { name: "leave_days", label: "Number of Days", value: "1" } },
-            { textInput: { name: "start_date", label: "Start Date (YYYY-MM-DD)", value: formatDateISO(new Date()) } },
-            { textInput: { name: "end_date", label: "End Date (YYYY-MM-DD)", value: formatDateISO(new Date()) } },
-            { textInput: { name: "reason", label: "Reason for Leave" } },
-            { buttonList: { buttons: [{ text: "Confirm Leave Application", onClick: { action: { actionMethodName: "SUBMIT_LEAVE" } } }] } }
-          ]
-        }]
-      }
-    }]
-  };
-}
