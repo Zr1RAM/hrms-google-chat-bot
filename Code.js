@@ -248,24 +248,24 @@ function renderAttendanceFormCard(empRecord) {
   };
 }
 
-function renderLeaveFormCard(empRecord) {
-  return {
-    actionResponse: { type: "NEW_MESSAGE" },
-    cardsV2: [{
-      cardId: "leaveCard",
-      card: {
-        header: { title: "Apply for Leave", subtitle: "Available Balances -> CL: " + empRecord['CL'] + " | SL: " + empRecord['SL'] + " | PL: " + empRecord['PL'] },
-        sections: [{
-          widgets: [
-            { textInput: { name: "leave_type", label: "Leave Type (CL / SL / PL)", value: "CL" } },
-            { textInput: { name: "leave_days", label: "Number of Days", value: "1" } },
-            { textInput: { name: "start_date", label: "Start Date (YYYY-MM-DD)", value: formatDateISO(new Date()) } },
-            { textInput: { name: "end_date", label: "End Date (YYYY-MM-DD)", value: formatDateISO(new Date()) } },
-            { textInput: { name: "reason", label: "Reason for Leave" } },
-            { buttonList: { buttons: [{ text: "Confirm Leave Application", onClick: { action: { actionMethodName: "SUBMIT_LEAVE" } } }] } }
-          ]
-        }]
-      }
-    }]
-  };
-}
+// function renderLeaveFormCard(empRecord) {
+//   return {
+//     actionResponse: { type: "NEW_MESSAGE" },
+//     cardsV2: [{
+//       cardId: "leaveCard",
+//       card: {
+//         header: { title: "Apply for Leave", subtitle: "Available Balances -> CL: " + empRecord['CL'] + " | SL: " + empRecord['SL'] + " | PL: " + empRecord['PL'] },
+//         sections: [{
+//           widgets: [
+//             { textInput: { name: "leave_type", label: "Leave Type (CL / SL / PL)", value: "CL" } },
+//             { textInput: { name: "leave_days", label: "Number of Days", value: "1" } },
+//             { textInput: { name: "start_date", label: "Start Date (YYYY-MM-DD)", value: formatDateISO(new Date()) } },
+//             { textInput: { name: "end_date", label: "End Date (YYYY-MM-DD)", value: formatDateISO(new Date()) } },
+//             { textInput: { name: "reason", label: "Reason for Leave" } },
+//             { buttonList: { buttons: [{ text: "Confirm Leave Application", onClick: { action: { actionMethodName: "SUBMIT_LEAVE" } } }] } }
+//           ]
+//         }]
+//       }
+//     }]
+//   };
+// }

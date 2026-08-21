@@ -1,4 +1,31 @@
+
 function renderLeaveFormCard(empRecord) {
+
+    function getLeaveBalanceNote() {
+  var today = new Date();
+  var day = today.getDate();
+  
+  // 1. Determine base month/year for "updated as of" (use previous month if before the 25th)
+  var baseDate = new Date(today.getFullYear(), today.getMonth() - (day < 25 ? 1 : 0), 25);
+  
+  // 2. Determine next month for "reflected from"
+  var nextDate = new Date(baseDate.getFullYear(), baseDate.getMonth() + 1, 25);
+
+  // Helper for ordinal suffixes (25th, 1st, 2nd, etc.)
+  function formatOrdinalDate(date) {
+    var d = date.getDate();
+    var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    var suffix = (d > 3 && d < 21) ? 'th' : ['th', 'st', 'nd', 'rd'][d % 10] || 'th';
+    return d + suffix + " " + months[date.getMonth()] + " " + date.getFullYear();
+  }
+
+  var updatedAsOf = formatOrdinalDate(baseDate);
+  var reflectedFrom = formatOrdinalDate(nextDate);
+
+  return "<b>Note:</b> Your leave balance is updated as of <b>" + updatedAsOf + "</b>. " +
+         "If you have taken any leave after this date, they will be reflected from <b>" + reflectedFrom + "</b> onwards.";
+}
+
   return {
     actionResponse: { type: "NEW_MESSAGE" },
     cardsV2: [{
@@ -34,6 +61,11 @@ function renderLeaveFormCard(empRecord) {
                 "topLabel": "Loyalty Leave (LL)",
                 "text": `<h1>${empRecord['LL'] || "Cannot find leaves"}</h1>`
               }
+            },
+            {
+                textParagraph: {
+                    text: getLeaveBalanceNote(),
+                }
             }
             // TO DO: above is demo below is your work
             // {
