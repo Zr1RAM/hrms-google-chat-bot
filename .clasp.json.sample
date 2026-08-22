@@ -1,6 +1,6 @@
 {
   "scriptId": "YOUR_SCRIPT_ID_HERE",
-  "rootDir": "",
+  "rootDir": "src",
   "projectId": "YOUR_GCP_PROJECT_ID_HERE",
   "scriptExtensions": [
     ".js",
