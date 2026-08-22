@@ -1,0 +1,11 @@
+# Ignore local Node & Git files
+.git/**
+node_modules/**
+package.json
+package-lock.json
+
+# Ignore local test scripts and utilities
+cli.js
+tests/**
+*.test.js
+preview.html
